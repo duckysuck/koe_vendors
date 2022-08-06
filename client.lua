@@ -37,6 +37,7 @@ AddEventHandler('onResourceStart', function(resourceName)
         Citizen.Wait(5000)
         ESX.PlayerLoaded = true
         CreateBlips()
+        TriggerServerEvent('koe_vendors:updateDB')
 	end
 end)
 ---------------------------------------------------------------------------------------------------------------------------------------
@@ -119,7 +120,7 @@ AddEventHandler('koe_vendors:spawnPed',function()
         {
             options = {
                 {
-                event = "koe_vendors:buyMenu",
+                event = "koe_vendors:getXP",
                 icon = "fa-solid fa-clipboard",
                 label = "Open Menu",
                 location = info.location,
@@ -135,71 +136,154 @@ AddEventHandler('koe_vendors:spawnPed',function()
     end
 
 end)
- 
+
+RegisterNetEvent('koe_vendors:getXP')
+AddEventHandler('koe_vendors:getXP',function(data)
+    local npc = data.npc
+    local location = data.location
+    TriggerServerEvent('koe_vendors:getPlayerXP', npc, location)
+end)
 
 RegisterNetEvent('koe_vendors:buyMenu')
-AddEventHandler('koe_vendors:buyMenu',function(data)
-    local labels = Config.VendorLocations[data.npc].itemsforsale
-    local options = {{title = 'Click an item below to purchase'}}
+AddEventHandler('koe_vendors:buyMenu',function(npc, location, crimlevel)
+    local src = source
+    local itemsForSale = Config.VendorLocations[npc].itemsforsale
+    local illegal = Config.VendorLocations[npc].illegal
+    local illegalString = nil
+    local optionsLegal = {{title = 'Click an item below to purchase'}}
+    local optionsIllegal = {{title = 'Click an item below to purchase'}}
 
-    for k, v in pairs(labels) do
-        local labels = Config.VendorLocations[data.npc].itemsforsale[k].label
-        local price = Config.VendorLocations[data.npc].itemsforsale[k].price
-        local itemname = Config.VendorLocations[data.npc].itemsforsale[k].itemname
-        local image = Config.VendorLocations[data.npc].itemsforsale[k].image
-
-        table.insert(options,
-            {
-                title = labels,
-                event = 'koe_vendors:keyboard',
-                metadata = {'Price: $'..price},
-                image = image,
-                args = {price = price, item = itemname}
-            }
-        )
+    if illegal == false then
+        illegalString = 'Legal'
+    elseif illegal == true then
+        illegalString = 'Illegal'
     end
 
-    lib.registerContext({
-        id = 'mainmenu',
-        title = data.location,
-        options = {
-            {
-                title = 'Items For Sale',
-                menu = 'itemsMenu',
-                description = 'Purchase goods from this vendor'
-            },
-            {
-                title = 'Silly Cars',
-                menu = 'carmenu',
-                description = 'Purchase silly cars from this vendor'
-            },
+    if illegal == false then
+        for k, v in pairs(itemsForSale) do
+            local labels = Config.VendorLocations[npc].itemsforsale[k].label
+            local price = Config.VendorLocations[npc].itemsforsale[k].price
+            local itemname = Config.VendorLocations[npc].itemsforsale[k].itemname
+            local image = Config.VendorLocations[npc].itemsforsale[k].image
 
-            lib.registerContext({
-                id = 'itemsMenu',
-                menu = 'mainmenu',
-                title = data.location,
-                options = options
-            })
-        }
-    })
-        lib.showContext('mainmenu')
+            table.insert(optionsLegal,
+                {
+                    title = labels,
+                    event = 'koe_vendors:keyboard',
+                    metadata = {'Price: $'..price},
+                    image = image,
+                    args = {price = price, item = itemname}
+                }
+            )
+        end
+    elseif illegal == true then
+        for k, v in pairs(itemsForSale) do
+            local labels = Config.VendorLocations[npc].itemsforsale[k].label
+            local price = Config.VendorLocations[npc].itemsforsale[k].price
+            local itemname = Config.VendorLocations[npc].itemsforsale[k].itemname
+            local requiredXP = Config.VendorLocations[npc].itemsforsale[k].requiredXP
+            local image = Config.VendorLocations[npc].itemsforsale[k].image
+
+            table.insert(optionsIllegal,
+                {
+                    title = labels,
+                    event = 'koe_vendors:amountIllegal',
+                    metadata = {
+                        {label = 'Price ', value = '$'..price},
+                        {label = 'Required Crime Rating ', value = requiredXP},
+                    },
+                    image = image,
+                    args = {price = price, item = itemname, requiredXP = requiredXP}
+                }
+            )
+        end
+    end
+
+    if illegal == false then
+        lib.registerContext({
+            id = 'legalMenu',
+            title = location,
+            options = {
+                {
+                    title = 'This vendor is  ' ..illegalString
+                },
+                {
+                    title = 'Items For Sale',
+                    menu = 'legalItemsMenu',
+                    description = 'Purchase goods from this vendor'
+                },
+                lib.registerContext({
+                    id = 'legalItemsMenu',
+                    menu = 'legalMenu',
+                    title = location,
+                    options = optionsLegal
+                })
+            }
+        })
+            lib.showContext('legalMenu')
+    elseif illegal == true then
+        lib.registerContext({
+            id = 'illegalMenu',
+            title = location,
+            options = {
+                {
+                    title = 'This vendor is  ' ..illegalString
+                },
+                {
+                    title = 'Current Crime Rating: ' ..crimlevel
+                },
+                {
+                    title = 'Illegal Items For Sale',
+                    menu = 'illegalItemsMenu',
+                    description = 'Purchase goods from this vendor'
+                },
+                lib.registerContext({
+                    id = 'illegalItemsMenu',
+                    menu = 'illegalMenu',
+                    title = location,
+                    options = optionsIllegal
+                })
+            }
+        })
+            lib.showContext('illegalMenu')
+    end
 
 end)
 
-RegisterNetEvent('koe_vendors:keyboard')
+RegisterNetEvent('koe_vendors:amountLegal')
 AddEventHandler('koe_vendors:keyboard',function(data)
     local item = data.item
     price = data.price
+
 
     local input = lib.inputDialog('How many?', {'Amount x $'..price..'.00'})
 
     if input then
         local amount = tonumber(input[1])
-        TriggerEvent('koe_vendors:purchase', item, amount, price)
+        TriggerEvent('koe_vendors:purchaseLegal', item, amount, price)
     end
 end)
 
-RegisterNetEvent('koe_vendors:purchase')
-AddEventHandler('koe_vendors:purchase',function(item, amount, price)
-    TriggerServerEvent('koe_vendors:sold', item, amount, price)
+RegisterNetEvent('koe_vendors:amountIllegal')
+AddEventHandler('koe_vendors:amountIllegal',function(data)
+    local item = data.item
+    price = data.price
+    neededXP = data.requiredXP
+
+    local input2 = lib.inputDialog('How many?', {'Amount x $'..price..'.00'})
+
+    if input2 then
+        local amount = tonumber(input2[1])
+        TriggerEvent('koe_vendors:purchaseIllegal', item, amount, price, neededXP)
+    end
+end)
+
+RegisterNetEvent('koe_vendors:purchaseLegal')
+AddEventHandler('koe_vendors:purchaseLegal',function(item, amount, price)
+    TriggerServerEvent('koe_vendors:soldLegal', item, amount, price)
+end)
+
+RegisterNetEvent('koe_vendors:purchaseIllegal')
+AddEventHandler('koe_vendors:purchaseIllegal',function(item, amount, price, neededXP)
+    TriggerServerEvent('koe_vendors:soldIllegal', item, amount, price, neededXP)
 end)

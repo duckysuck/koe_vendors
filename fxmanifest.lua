@@ -15,7 +15,11 @@ client_scripts {
 	'server.lua',
 	'config.lua'
  }
- files {
-	'/ox_inventory/web/build/images/*.png',
-}
- shared_script '@ox_lib/init.lua'
+
+
+server_export 'getCrimLevel'
+server_export 'giveCrimLevel'
+server_export 'setCrimlevel'
+
+
+shared_script '@ox_lib/init.lua'
