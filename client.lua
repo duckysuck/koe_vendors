@@ -40,7 +40,7 @@ AddEventHandler('onResourceStart', function(resourceName)
 	end
 end)
 ---------------------------------------------------------------------------------------------------------------------------------------
-local npcSpawned = false
+local zonesSpawned = false
 local PlayerData = {}
 local vendors
 
@@ -60,16 +60,16 @@ end)
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(500)
+        Citizen.Wait(10)
 
         for k, v in pairs(Config.VendorLocations) do 
-            local npcCoords = v.npccoords
+            local npcCoords = v.pzCoords
             local pedCoords = GetEntityCoords(PlayerPedId()) 
             local dst = #(npcCoords - pedCoords)
             
-            if dst < 30 and npcSpawned == false then
-                TriggerEvent('koe_vendors:spawnPeds')
-                npcSpawned = true
+            if dst < 30 and zonesSpawned == false then
+                TriggerEvent('koe_vendors:spawnZones')
+                zonesSpawned = true
             end
             -- if dst >= 31  then
             --     npcSpawned = false
@@ -83,7 +83,7 @@ end)
 function CreateBlipsVendors()
     for k, v in pairs(Config.VendorLocations) do
         if (v.blip ~= nil) then
-            local blip = AddBlipForCoord(v.npccoords)
+            local blip = AddBlipForCoord(v.pzCoords)
             SetBlipSprite (blip, v.blip.sprite)
             SetBlipDisplay(blip, 6)
             SetBlipScale  (blip, 1.1)
@@ -97,54 +97,89 @@ function CreateBlipsVendors()
     end
 end
 
-RegisterNetEvent('koe_vendors:spawnPeds')
-AddEventHandler('koe_vendors:spawnPeds',function()
-
+RegisterNetEvent('koe_vendors:spawnZones')
+AddEventHandler('koe_vendors:spawnZones',function()
+  
     for locations, info in pairs(Config.VendorLocations) do
-        local hash = GetHashKey(info.npcmodel)
 
-        if not HasModelLoaded(hash) then
-            RequestModel(hash)
-            Wait(10)
-        end
-        while not HasModelLoaded(hash) do 
-            Wait(10)
-        end
-
-        vendors = CreatePed(5, hash, info.npccoords , info.npcheading, false, false)
-        FreezeEntityPosition(vendors, true)
-        SetEntityInvincible(vendors, true)
-        SetBlockingOfNonTemporaryEvents(vendors, true)
-        SetModelAsNoLongerNeeded(hash)
-    
-        exports['qtarget']:AddEntityZone(info.location, vendors, 
-        {                
-            name=info.location,
-            debugPoly=false,
-            useZ = true
-        }, 
-        {
-            options = {
-                {
-                event = "koe_vendors:WhichMenu",
-                icon = "fa-solid fa-clipboard",
-                label = "Open Menu",
-                location = info.location,
-                npc = locations,
-                illegal = info.illegal,
-                items = Config.VendorLocations[locations].sellableitems,
-                type = info.type,
-                canInteract = function()
-                    local player = PlayerPedId()
-                    return IsPedOnFoot(player)
-                end,
-                },                                     
+        exports.qtarget:AddBoxZone(info.location, info.pzCoords, info.pzW, info.pzH,{
+            name= info.location,
+            heading= info.pzHeading,
+            debugPoly= false,
+            minZ= info.pzMin,  
+            maxZ= info.pzMax,
             },
-                distance = 2.5
-        })  
+                {
+                options = {
+                    {
+                    event = "koe_vendors:WhichMenu",
+                    icon = "fa-solid fa-clipboard",
+                    label = "Open Menu",
+                    location = info.location,
+                    npc = locations,
+                    illegal = info.illegal,
+                    items = info.sellableitems,
+                    type = info.type,
+                    canInteract = function()
+                        local player = PlayerPedId()
+                        return IsPedOnFoot(player)
+                    end,
+                    },                                     
+                },
+                    distance = 2.5
+        }) 
     end
 
 end)
+
+-- RegisterNetEvent('koe_vendors:spawnPeds')
+-- AddEventHandler('koe_vendors:spawnPeds',function()
+  
+--     for locations, info in pairs(Config.VendorLocations) do
+--         local hash = GetHashKey(info.npcmodel)
+
+--         if not HasModelLoaded(hash) then
+--             RequestModel(hash)
+--             Wait(10)
+--         end
+--         while not HasModelLoaded(hash) do 
+--             Wait(10)
+--         end
+
+--         vendors = CreatePed(5, hash, info.npccoords , info.npcheading, true, true)
+--         -- Wait Until The Ped Is Created
+--         while not DoesEntityExist(vendors) do Wait(0) end
+
+--         FreezeEntityPosition(vendors, true)
+--         SetEntityInvincible(vendors, true)
+--         SetBlockingOfNonTemporaryEvents(vendors, true)
+--         SetModelAsNoLongerNeeded(hash)
+
+
+    
+--             exports['qtarget']:AddTargetEntity(vendors, 
+--             {
+--                 options = {
+--                     {
+--                     event = "koe_vendors:WhichMenu",
+--                     icon = "fa-solid fa-clipboard",
+--                     label = "Open Menu",
+--                     location = info.location,
+--                     npc = locations,
+--                     illegal = info.illegal,
+--                     items = Config.VendorLocations[locations].sellableitems,
+--                     type = info.type,
+--                     canInteract = function()
+--                         local player = PlayerPedId()
+--                         return IsPedOnFoot(player)
+--                     end,
+--                     },                                     
+--                 },
+--                     distance = 2.5
+--             }) 
+--     end
+
+-- end)
 
 RegisterNetEvent('koe_vendors:WhichMenu')
 AddEventHandler('koe_vendors:WhichMenu',function(data)

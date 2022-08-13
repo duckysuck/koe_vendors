@@ -15,16 +15,19 @@
 
 Config = {}
 
-Config.DebugPrints = true
+Config.DebugPrints = false
 
 -- blip = {label = 'Jax Collectibles Stash', sprite = 442, colour = 5}, --Blip will use the location of the NPC, set to NIL if you dont want a blip.
 
 Config.VendorLocations = {
 	legalFishing = {
 		location = 'Fish Vendor', 
-        npccoords = vector3(-1600.76, -976.0, 12.0),
-        npcheading = 50.84,
-		npcmodel = 'a_m_y_surfer_01',
+        pzCoords = vector3(-1600.18, -976.5, 13.02),
+        pzW = 2.4,
+        pzH = 1,
+        pzHeading = 320,
+		pzMin = 12.02,
+        pzMax = 14.62,
         illegal = false,
         type = 'vendor',
         blip = {label = 'Fish Items', sprite = 59, colour = 5}, --Blip will use the location of the NPC, set to NIL if you dont want a blip.
@@ -35,9 +38,12 @@ Config.VendorLocations = {
     },
     divingSupplies = {
 		location = 'Diving Supplies', 
-        npccoords = vector3(-1639.36, -1018.88, 12.16),
-        npcheading = 50.84,
-		npcmodel = 'a_f_y_beach_01',
+        pzCoords = vector3(-1685.91, -1073.01, 13.15),
+        pzW = 2.0,
+        pzH = 1,
+        pzHeading = 140,
+		pzMin = 12.15,
+        pzMax = 14.958,
         illegal = false,
         type = 'vendor',
         blip = {label = 'Diving Supplies', sprite = 366, colour = 54}, --Blip will use the location of the NPC, set to NIL if you dont want a blip.
@@ -48,9 +54,12 @@ Config.VendorLocations = {
     },
     blackMarket = {
 		location = 'Black Market', 
-        npccoords = vector3(315.04, 2892.16, 45.48), 
-        npcheading = 32.36,
-		npcmodel = 'g_m_y_lost_03',
+        pzCoords = vector3(288.34, 2844.24, 44.7),
+        pzW = 1.6,
+        pzH = 1,
+        pzHeading = 211,
+		pzMin = 43.7,
+        pzMax = 46.1,
         illegal = true,
         blip = nil,
         type = 'vendor',
@@ -72,9 +81,12 @@ Config.VendorLocations = {
     },
     attachmentsVendor = {
 		location = 'Attachments Vendor', 
-        npccoords = vector3(-580.44, -1589.6, 25.76), 
-        npcheading = 107.04,
-		npcmodel = 'a_m_m_og_boss_01',
+        pzCoords = vector3(-579.81, -1589.42, 26.75),
+        pzW = 1.6,
+        pzH = 1,
+        pzHeading = 200,
+		pzMin = 25.75,
+        pzMax = 28.75,
         illegal = true,
         blip = nil,
         type = 'vendor',
@@ -92,9 +104,12 @@ Config.VendorLocations = {
     -----------------------------------------------------
     legalHunting = {
 		location = 'Legal NPC - Hunting', 
-        npccoords = vector3(591.88, 2782.72, 42.48), 
-        npcheading = 3.52,
-		npcmodel = 'cs_hunter',
+        pzCoords = vector3(591.98, 2782.16, 43.48),
+        pzW = 1.6,
+        pzH = 1,
+        pzHeading = 274,
+		pzMin = 42.48,
+        pzMax = 44.88,
         blip = {label = 'Legal Hunting Vendor', sprite = 442, colour = 5},
 		illegal = false,
         type = 'sellers',
@@ -118,9 +133,12 @@ Config.VendorLocations = {
     },
 	illegalHunting = {
 		location = 'Illegal NPC Hunting', 
-        npccoords = vector3(1996.02, 4982.71, 40.63), 
-        npcheading = 219.41, 
-		npcmodel = 'cs_hunter',
+        pzCoords = vector3(-1593.65, 5202.6, 4.31),
+        pzW = 1.4,
+        pzH = 1,
+        pzHeading = 205,
+		pzMin = 3.31,
+        pzMax = 6.11,
         blip = nil,
 		illegal = true,
         type = 'sellers',
@@ -132,9 +150,12 @@ Config.VendorLocations = {
     },
 	pawnShop = {
 		location = 'Pawn Shop', 
-        npccoords = vector3(-1841.4, -1235.64, 12.1), 
-        npcheading = 322.08,
-		npcmodel = 'ig_money', 
+        pzCoords = vector3(286.56, 136.26, 104.3),
+        pzW = 5.4,
+        pzH = 1,
+        pzHeading = 250,
+		pzMin = 103.3,
+        pzMax = 106.3,
         blip = {label = 'Pawnshop', sprite = 500, colour = 2},
 		illegal = false,
         type = 'sellers',
@@ -154,9 +175,12 @@ Config.VendorLocations = {
     },
 	legalFish = {
 		location = 'Fish Market', 
-        npccoords = vector3(-1842.12, -1199.36, 13.32), 
-        npcheading = 238.32,
-		npcmodel = 's_m_y_factory_01', 
+        pzCoords = vector3(-1842.68, -1198.91, 14.3),
+        pzW = 2.4,
+        pzH = 1,
+        pzHeading = 150,
+		pzMin = 13.3,
+        pzMax = 16.5,
         blip = {label = 'Fish Market', sprite = 371, colour = 18},
 		illegal = false,
         type = 'sellers',
@@ -179,9 +203,12 @@ Config.VendorLocations = {
     },
     illegalFish = {
 		location = 'Illegal Fish Market', 
-        npccoords = vector3(-1811.08, -1235.72, 7.6), 
-        npcheading = 232.08,
-		npcmodel = 'a_m_y_jetski_01', 
+        pzCoords = vector3(1321.8, 4314.41, 38.22),
+        pzW = 1.6,
+        pzH = 1,
+        pzHeading = 169,
+		pzMin = 37.22,
+        pzMax = 40.02,
         blip = nil,
 		illegal = true,
         type = 'sellers',
@@ -194,9 +221,12 @@ Config.VendorLocations = {
     },
     scrapper = {
 		location = 'Scrapper', 
-        npccoords = vector3(1132.04, -776.76, 56.6), 
-        npcheading = 1.88,
-		npcmodel = 'mp_m_waremech_01', 
+        pzCoords = vector3(1130.3, -777.6, 57.61),
+        pzW = 1.6,
+        pzH = 1,
+        pzHeading = 269,
+		pzMin = 56.61,
+        pzMax = 59.41,
         blip = {label = 'Scrapper', sprite = 527, colour = 18},
 		illegal = false,
         type = 'sellers',
@@ -213,9 +243,12 @@ Config.VendorLocations = {
     },
     jeweler = {
 		location = 'Jeweler/Collector', 
-        npccoords = vector3(182.28, -1319.36, 29.32), 
-        npcheading = 239.0,
-		npcmodel = 'a_m_m_business_0', 
+        pzCoords = vector3(-20.07, 6489.99, 31.5),
+        pzW = 1.6,
+        pzH = 1,
+        pzHeading = 315,
+		pzMin = 30.5,
+        pzMax = 32.9,
         blip = {label = 'Jeweler/Collector', sprite = 617, colour = 4},
 		illegal = false,
         type = 'sellers',
@@ -230,9 +263,12 @@ Config.VendorLocations = {
     },
     illegalJeweler = {
 		location = 'Illegal Collector', 
-        npccoords = vector3(522.36, -971.76, 26.44), 
-        npcheading = 357.44,
-		npcmodel = 'a_m_m_paparazzi_01', 
+        pzCoords = vector3(1642.46, 4853.54, 42.03),
+        pzW = 1.6,
+        pzH = 1,
+        pzHeading = 8,
+		pzMin = 41.03,
+        pzMax = 43.43,
         blip = nil,
 		illegal = true,
         type = 'sellers',
@@ -245,11 +281,6 @@ Config.VendorLocations = {
             gold_bracelet = {price = 800, label = 'Gold Bracelet'},
         }
     },
-}
-
-
-Config.SellerLocations = {
-	
 }
 
 -- USE BELOW TO GIVE CRIM RATING TO SOMEONE SERVER SIDE
