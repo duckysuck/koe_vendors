@@ -21,5 +21,9 @@ server_export 'getCrimLevel'
 server_export 'giveCrimLevel'
 server_export 'setCrimlevel'
 
+server_export 'getCivLevel'
+server_export 'giveCivLevel'
+server_export 'setCivLevel'
+
 
 shared_script '@ox_lib/init.lua'

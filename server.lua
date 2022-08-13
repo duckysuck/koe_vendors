@@ -39,8 +39,8 @@ TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
     -- end)
 
 
-RegisterNetEvent('koe_vendors:getPlayerXP')
-AddEventHandler('koe_vendors:getPlayerXP', function(npc, location)
+RegisterNetEvent('koe_vendors:getCrimRating')
+AddEventHandler('koe_vendors:getCrimRating', function(npc, location)
     local src = source
     local identifier =  ESX.GetPlayerFromId(src).identifier
     local crimlevel = exports['koe_vendors']:getCrimLevel(identifier)
@@ -81,14 +81,14 @@ AddEventHandler('koe_vendors:soldIllegal', function(item, amount, price, neededX
 
     if crimlevel >= neededXP then
         if ox_inventory:CanCarryItem(src, item, amount) then
-            if xPlayer.getMoney() >= charge then
+            if xPlayer.getAccount('black_money').money >= charge then
                 
                 xPlayer.addInventoryItem(item, amount)
-                xPlayer.removeInventoryItem('money', charge)
+                xPlayer.removeInventoryItem('black_money', charge)
 
                 TriggerClientEvent('ox_lib:notify', src, {type = 'success', description = 'You bought '..item..' x'..amount..' for $'..price, duration = 8000, position = 'top'})
             else
-                TriggerClientEvent('ox_lib:notify', src, {type = 'error', description = "Not enough money", duration = 8000, position = 'top'})
+                TriggerClientEvent('ox_lib:notify', src, {type = 'error', description = "Not enough firty money", duration = 8000, position = 'top'})
             end
         else
             TriggerClientEvent('ox_lib:notify', src, {type = 'error', description = "Not enough space", duration = 8000, position = 'top'})
@@ -121,6 +121,183 @@ end
 function giveCrimLevel(identifier, amount)
     MySQL.Async.execute(
         "UPDATE `users` SET `crim_level`= `crim_level` + @amount WHERE `identifier` = @identifier",
+        {["@amount"] = amount, ["@identifier"] = identifier},
+        function()
+    end)
+end
+
+RegisterNetEvent('koe_vendors:getCivRating')
+AddEventHandler('koe_vendors:getCivRating', function(location, npc, illegal, buymessage, items)
+    local src = source
+    local identifier =  ESX.GetPlayerFromId(src).identifier
+    local civRating = exports['koe_vendors']:getCivLevel(identifier)
+    local level 
+
+    if civRating <= 99 then
+        level = 0
+    elseif civRating <= 199 then
+        level = 1 
+    elseif civRating <= 299 then
+        level = 2
+    elseif civRating <= 1000 then
+        level = 3
+    elseif civRating <= 2000 then
+        level = 4
+    elseif civRating <= 2500 then
+        level = 5
+    elseif civRating <= 3000 then
+        level = 6
+    elseif civRating <= 3500 then
+        level = 7
+    elseif civRating <= 4000 then
+        level = 8
+    elseif civRating <= 4500 then
+        level = 9
+    elseif civRating >= 5000 then
+        level = 10
+    end
+
+    TriggerClientEvent('koe_vendors:sellMenu', src, location, npc, illegal, buymessage, items, civRating, level)
+end)
+
+
+RegisterNetEvent('koe_vendors:SellShit')
+AddEventHandler('koe_vendors:SellShit', function(location, illegal, npc, buymessage, civRating, level)
+    local items = {}
+    local sellableItems = Config.SellerLocations[npc].sellableitems
+    local xPlayer = ESX.GetPlayerFromId(source)
+    local soldfor
+    local bonus = nil
+
+    if illegal == false then
+
+        for k, v in pairs(sellableItems) do
+
+            table.insert(items, k)
+            local itemCount = xPlayer.getInventoryItem(k).count
+            local price = v.price * itemCount
+
+            if level == 0 then  
+                bonus = price * 0.00
+                price = price + bonus 
+
+                xPlayer.removeInventoryItem(k, itemCount) 
+                xPlayer.addAccountMoney('money', price)
+
+            elseif level == 1 then
+                bonus = price * 0.05
+                price = price + bonus 
+
+                xPlayer.removeInventoryItem(k, itemCount) 
+                xPlayer.addAccountMoney('money', price)
+
+            elseif level == 2 then
+                bonus = price * 0.07
+                price = price + bonus 
+
+                xPlayer.removeInventoryItem(k, itemCount) 
+                xPlayer.addAccountMoney('money', price)
+
+            elseif level == 3 then
+                bonus = price * 0.09
+                price = price + bonus 
+
+                xPlayer.removeInventoryItem(k, itemCount) 
+                xPlayer.addAccountMoney('money', price)
+            
+            elseif level == 4 then
+                bonus = price * 0.11
+                price = price + bonus 
+
+                xPlayer.removeInventoryItem(k, itemCount) 
+                xPlayer.addAccountMoney('money', price)
+
+            elseif level == 5 then
+                bonus = price * 0.13
+                price = price + bonus 
+
+                xPlayer.removeInventoryItem(k, itemCount) 
+                xPlayer.addAccountMoney('money', price)
+
+            elseif level == 6 then
+                bonus = price * 0.15
+                price = price + bonus 
+
+                xPlayer.removeInventoryItem(k, itemCount) 
+                xPlayer.addAccountMoney('money', price)
+
+            elseif level == 7 then
+                bonus = price * 0.17
+                price = price + bonus 
+
+                xPlayer.removeInventoryItem(k, itemCount) 
+                xPlayer.addAccountMoney('money', price)
+
+            elseif level == 8 then
+                bonus = price * 0.19
+                price = price + bonus 
+
+                xPlayer.removeInventoryItem(k, itemCount) 
+                xPlayer.addAccountMoney('money', v.price * itemCount * 0.19 )
+
+            elseif level == 9 then
+                bonus = price * 0.25
+                price = price + bonus 
+
+                xPlayer.removeInventoryItem(k, itemCount) 
+                xPlayer.addAccountMoney('money', price)
+                
+            elseif level == 10 then
+                bonus = price * 0.30
+                price = price + bonus
+
+                xPlayer.removeInventoryItem(k, itemCount) 
+                xPlayer.addAccountMoney('money', price )
+            end
+        end
+    
+    else
+        -- for k, v in pairs(sellableItems) do
+        --     table.insert(items, k)
+        --     local itemCount = xPlayer.getInventoryItem(k).count
+    
+        --     xPlayer.removeInventoryItem(k, itemCount) 
+        --     xPlayer.addAccountMoney('black_money', v.price * itemCount)
+        --     soldSomething = true
+        -- end
+        -- if soldSomething  then
+        --     TriggerClientEvent('ox_lib:notify', source, {type = 'inform', description = 'Come back again!', duration = 8000, position = 'top'})
+        --     soldSomething = false
+        -- else
+        --     TriggerClientEvent('ox_lib:notify', source, {type = 'error', description = buymessage, duration = 8000, position = 'top'})
+        --     soldSomething = false
+        -- end
+    end
+end)
+
+
+--SERVER EXPORTS--
+------------------
+function setCivLevel(identifier, level)
+    MySQL.Async.execute(
+        "UPDATE `users` SET `civ_level`= @xp WHERE `identifier` = @identifier",
+        {["@xp"] = level, ["@identifier"] = identifier},
+        function()
+    end)
+end
+
+function getCivLevel(identifier)
+    return tonumber(
+        MySQL.Sync.fetchScalar(
+            "SELECT `civ_level` FROM users WHERE identifier = @identifier ",
+            {["@identifier"] = identifier}
+        )
+    )
+end
+
+function giveCivLevel(identifier, amount)
+    MySQL.Async.execute(
+        "UPDATE `users` SET `civ_level`= `civ_level` + @amount WHERE `identifier` = @identifier",
         {["@amount"] = amount, ["@identifier"] = identifier},
         function()
     end)
