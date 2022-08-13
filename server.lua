@@ -88,7 +88,7 @@ AddEventHandler('koe_vendors:soldIllegal', function(item, amount, price, neededX
 
                 TriggerClientEvent('ox_lib:notify', src, {type = 'success', description = 'You bought '..item..' x'..amount..' for $'..price, duration = 8000, position = 'top'})
             else
-                TriggerClientEvent('ox_lib:notify', src, {type = 'error', description = "Not enough firty money", duration = 8000, position = 'top'})
+                TriggerClientEvent('ox_lib:notify', src, {type = 'error', description = "Not enough Dirty money", duration = 8000, position = 'top'})
             end
         else
             TriggerClientEvent('ox_lib:notify', src, {type = 'error', description = "Not enough space", duration = 8000, position = 'top'})
@@ -107,9 +107,16 @@ function setCrimlevel(identifier, level)
         {["@xp"] = level, ["@identifier"] = identifier},
         function()
     end)
+    if Config.DebugPrints then
+        print(identifier..' Crim level was set to '..level)
+    end
 end
 
 function getCrimLevel(identifier)
+    if Config.DebugPrints then
+        print('Got '..identifier..' Crim Rating')
+    end
+
     return tonumber(
         MySQL.Sync.fetchScalar(
             "SELECT `crim_level` FROM users WHERE identifier = @identifier ",
@@ -124,13 +131,17 @@ function giveCrimLevel(identifier, amount)
         {["@amount"] = amount, ["@identifier"] = identifier},
         function()
     end)
+    if Config.DebugPrints then
+        print(identifier..'Received '..amount..' Crim Rating')
+    end
 end
 
 RegisterNetEvent('koe_vendors:getCivRating')
-AddEventHandler('koe_vendors:getCivRating', function(location, npc, illegal, buymessage, items)
+AddEventHandler('koe_vendors:getCivRating', function(location, npc, illegal, items)
     local src = source
     local identifier =  ESX.GetPlayerFromId(src).identifier
     local civRating = exports['koe_vendors']:getCivLevel(identifier)
+    local crimRating = exports['koe_vendors']:getCrimLevel(identifier)
     local level 
 
     if civRating <= 99 then
@@ -157,14 +168,14 @@ AddEventHandler('koe_vendors:getCivRating', function(location, npc, illegal, buy
         level = 10
     end
 
-    TriggerClientEvent('koe_vendors:sellMenu', src, location, npc, illegal, buymessage, items, civRating, level)
+    TriggerClientEvent('koe_vendors:sellMenu', src, location, npc, illegal, items, civRating, level, crimRating)
 end)
 
 
 RegisterNetEvent('koe_vendors:SellShit')
-AddEventHandler('koe_vendors:SellShit', function(location, illegal, npc, buymessage, civRating, level)
+AddEventHandler('koe_vendors:SellShit', function(location, illegal, npc, civRating, level)
     local items = {}
-    local sellableItems = Config.SellerLocations[npc].sellableitems
+    local sellableItems = Config.VendorLocations[npc].sellableitems
     local xPlayer = ESX.GetPlayerFromId(source)
     local soldfor
     local bonus = nil
@@ -257,21 +268,13 @@ AddEventHandler('koe_vendors:SellShit', function(location, illegal, npc, buymess
         end
     
     else
-        -- for k, v in pairs(sellableItems) do
-        --     table.insert(items, k)
-        --     local itemCount = xPlayer.getInventoryItem(k).count
+        for k, v in pairs(sellableItems) do
+            table.insert(items, k)
+            local itemCount = xPlayer.getInventoryItem(k).count
     
-        --     xPlayer.removeInventoryItem(k, itemCount) 
-        --     xPlayer.addAccountMoney('black_money', v.price * itemCount)
-        --     soldSomething = true
-        -- end
-        -- if soldSomething  then
-        --     TriggerClientEvent('ox_lib:notify', source, {type = 'inform', description = 'Come back again!', duration = 8000, position = 'top'})
-        --     soldSomething = false
-        -- else
-        --     TriggerClientEvent('ox_lib:notify', source, {type = 'error', description = buymessage, duration = 8000, position = 'top'})
-        --     soldSomething = false
-        -- end
+            xPlayer.removeInventoryItem(k, itemCount) 
+            xPlayer.addAccountMoney('black_money', v.price * itemCount)
+        end
     end
 end)
 
@@ -284,9 +287,15 @@ function setCivLevel(identifier, level)
         {["@xp"] = level, ["@identifier"] = identifier},
         function()
     end)
+    if Config.DebugPrints then
+        print(identifier..' Civ level was set to '..level)
+    end
 end
 
 function getCivLevel(identifier)
+    if Config.DebugPrints then
+        print('Got '..identifier..' Civ Rating')
+    end
     return tonumber(
         MySQL.Sync.fetchScalar(
             "SELECT `civ_level` FROM users WHERE identifier = @identifier ",
@@ -301,4 +310,19 @@ function giveCivLevel(identifier, amount)
         {["@amount"] = amount, ["@identifier"] = identifier},
         function()
     end)
+    if Config.DebugPrints then
+        print(identifier..'Received '..amount..' Civ Rating')
+    end
 end
+
+
+RegisterNetEvent('koe_vendors:ratingsForMenu')
+AddEventHandler('koe_vendors:ratingsForMenu', function()
+    local src = source
+    identifier =  ESX.GetPlayerFromId(src).identifier
+
+    local crimRatingForMenu = exports['koe_vendors']:getCrimLevel(identifier)
+    local civRatingForMenu = exports['koe_vendors']:getCivLevel(identifier)
+    
+    TriggerClientEvent('koe_vendors:ratingsMenu', src, crimRatingForMenu, civRatingForMenu)
+end)

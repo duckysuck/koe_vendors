@@ -1,6 +1,6 @@
 ----Gets ESX-------------------------------------------------------------------------------------------------------------------------------
 ESX = nil
-
+local peds = {}
 Citizen.CreateThread(function()
 	while ESX == nil do
 		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
@@ -22,7 +22,7 @@ Citizen.CreateThread(function()
 		end
 		ESX.PlayerData = xPlayer
 		PlayerLoaded = true
-        CreateBlips()
+        CreateBlipsVendors()
 	end)
 end) 
 
@@ -36,17 +36,13 @@ AddEventHandler('onResourceStart', function(resourceName)
         while (ESX == nil) do Citizen.Wait(100) end        
         Citizen.Wait(5000)
         ESX.PlayerLoaded = true
-        CreateBlips()
-        -- TriggerServerEvent('koe_vendors:updateDB')
+        CreateBlipsVendors()
 	end
 end)
 ---------------------------------------------------------------------------------------------------------------------------------------
-
-
 local npcSpawned = false
-local npcSpawned2 = false
-
 local PlayerData = {}
+local vendors
 
 Citizen.CreateThread(function()
     while ESX == nil do
@@ -55,12 +51,16 @@ Citizen.CreateThread(function()
     end
 end)
 
+RegisterCommand('ratings', function(source)
+	TriggerServerEvent('koe_vendors:ratingsForMenu')
+end)
+
 ------BUY ITEMS NPC FUNCTIONS-----------------
 ----------------------------------------------
---Spawn NPC--
+
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(1000)
+        Citizen.Wait(500)
 
         for k, v in pairs(Config.VendorLocations) do 
             local npcCoords = v.npccoords
@@ -68,7 +68,7 @@ Citizen.CreateThread(function()
             local dst = #(npcCoords - pedCoords)
             
             if dst < 30 and npcSpawned == false then
-                TriggerEvent('koe_vendors:spawnPed')
+                TriggerEvent('koe_vendors:spawnPeds')
                 npcSpawned = true
             end
             -- if dst >= 31  then
@@ -80,8 +80,7 @@ Citizen.CreateThread(function()
 end)
 
 
-
-function CreateBlips()
+function CreateBlipsVendors()
     for k, v in pairs(Config.VendorLocations) do
         if (v.blip ~= nil) then
             local blip = AddBlipForCoord(v.npccoords)
@@ -98,10 +97,12 @@ function CreateBlips()
     end
 end
 
-RegisterNetEvent('koe_vendors:spawnPed')
-AddEventHandler('koe_vendors:spawnPed',function()
+RegisterNetEvent('koe_vendors:spawnPeds')
+AddEventHandler('koe_vendors:spawnPeds',function()
+
     for locations, info in pairs(Config.VendorLocations) do
         local hash = GetHashKey(info.npcmodel)
+
         if not HasModelLoaded(hash) then
             RequestModel(hash)
             Wait(10)
@@ -115,7 +116,7 @@ AddEventHandler('koe_vendors:spawnPed',function()
         SetEntityInvincible(vendors, true)
         SetBlockingOfNonTemporaryEvents(vendors, true)
         SetModelAsNoLongerNeeded(hash)
-
+    
         exports['qtarget']:AddEntityZone(info.location, vendors, 
         {                
             name=info.location,
@@ -125,11 +126,14 @@ AddEventHandler('koe_vendors:spawnPed',function()
         {
             options = {
                 {
-                event = "koe_vendors:getCrimR",
+                event = "koe_vendors:WhichMenu",
                 icon = "fa-solid fa-clipboard",
                 label = "Open Menu",
                 location = info.location,
                 npc = locations,
+                illegal = info.illegal,
+                items = Config.VendorLocations[locations].sellableitems,
+                type = info.type,
                 canInteract = function()
                     local player = PlayerPedId()
                     return IsPedOnFoot(player)
@@ -142,10 +146,25 @@ AddEventHandler('koe_vendors:spawnPed',function()
 
 end)
 
-RegisterNetEvent('koe_vendors:getCrimR')
-AddEventHandler('koe_vendors:getCrimR',function(data)
+RegisterNetEvent('koe_vendors:WhichMenu')
+AddEventHandler('koe_vendors:WhichMenu',function(data)
     local npc = data.npc
     local location = data.location
+    local illegal = data.illegal
+    items = data.items
+    typeOfVendor = data.type
+
+    if typeOfVendor == 'vendor' then
+        TriggerEvent('koe_vendors:getCrimR', npc, location, illegal, items)
+    else
+        TriggerEvent('koe_vendors:buffer', npc, location, illegal, items)
+    end
+end)
+
+RegisterNetEvent('koe_vendors:getCrimR')
+AddEventHandler('koe_vendors:getCrimR',function(npc, location, illegal, items)
+    local npc = npc
+    local location = location
     TriggerServerEvent('koe_vendors:getCrimRating', npc, location)
 end)
 
@@ -297,93 +316,25 @@ end)
 -------------------------------------------------
 --VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV-
 
-Citizen.CreateThread(function()
-    while true do
-        Citizen.Wait(1000)
-
-        for k, v in pairs(Config.SellerLocations) do 
-            local npcCoords2 = v.npccoords
-            local pedCoords2 = GetEntityCoords(PlayerPedId()) 
-            local dst2 = #(npcCoords2 - pedCoords2)
-            
-            if dst2 < 30 and npcSpawned2 == false then
-                TriggerEvent('koe_vendors:spawnPed2')
-                npcSpawned2 = true
-            end
-            -- if dst >= 31  then
-            --     npcSpawned = false
-            --     DeleteEntity(sellers)
-            -- end
-        end
-    end
-end)
-
-RegisterNetEvent('koe_vendors:spawnPed2')
-AddEventHandler('koe_vendors:spawnPed2',function()
-    for locations, info in pairs(Config.SellerLocations) do
-        local hash = GetHashKey(info.npcmodel)
-        if not HasModelLoaded(hash) then
-            RequestModel(hash)
-            Wait(10)
-        end
-        while not HasModelLoaded(hash) do 
-            Wait(10)
-        end
-
-        sellers = CreatePed(5, hash, info.npccoords , info.npcheading, false, false)
-        FreezeEntityPosition(sellers, true)
-        SetEntityInvincible(sellers, true)
-        SetBlockingOfNonTemporaryEvents(sellers, true)
-        SetModelAsNoLongerNeeded(hash)
-
-        exports['qtarget']:AddEntityZone(info.location, sellers, 
-        {                
-            name=info.location,
-            debugPoly=false,
-            useZ = true
-        }, 
-        {
-            options = {
-                {
-                event = "koe_vendors:buffer",
-                icon = 'fas fa-basket-shopping',
-                label = "Open Seller Menu",
-                location = info.location,
-                npc = locations,
-                illegal = info.illegal,
-                buymessage = info.buymessage,
-                items = Config.SellerLocations[locations].sellableitems,
-                canInteract = function()
-                    local player = PlayerPedId()
-                    return IsPedOnFoot(player)
-                end,
-                },                                     
-            },
-                distance = 2.5
-        })  
-    end
-
-end)
-
 
 RegisterNetEvent('koe_vendors:buffer')
-AddEventHandler('koe_vendors:buffer',function(data)
-    location = data.location
-    npc = data.npc
-    illegal = data.illegal
-    buymessage = data.buymessage
-    items = data.items
+AddEventHandler('koe_vendors:buffer',function(npc, location, illegal, items)
+    location = location
+    npc = npc
+    illegal = illegal
+    items = items
 
-    TriggerServerEvent('koe_vendors:getCivRating', location, npc, illegal, buymessage, items)
+    TriggerServerEvent('koe_vendors:getCivRating', location, npc, illegal, items)
 end)
 
 RegisterNetEvent('koe_vendors:sellMenu')
-AddEventHandler('koe_vendors:sellMenu',function(location, npc, illegal, buymessage, items, civRating, level)
+AddEventHandler('koe_vendors:sellMenu',function(location, npc, illegal, items, civRating, level, crimRating)
     local civRating = civRating
-    local items = items
+    items = items
     local itemLabels = {}
 
-    local options = {{title = 'Civ Rating: '..civRating, icon = 'fas fa-ranking-star', metadata = {'Current Civilian Rating!'}},{title = 'CLICK HERE TO SELL', description = 'This npc will buy any items listed below.', arrow = true, event = 'koe_vendors:sellCheck', icon = 'fas fa-basket-shopping', args = {location = location, illegal = illegal, buymessage = buymessage, npc = npc, civRating = civRating, level = level}}}
+    if not illegal then
+        local options = {{title = 'Civ Rating: '..civRating, icon = 'fas fa-ranking-star', metadata = {'Current Civilian Rating!'}},{title = 'CLICK HERE TO SELL', description = 'This npc will buy any items listed below.', arrow = true, event = 'koe_vendors:sellCheck', icon = 'fas fa-basket-shopping', args = {location = location, illegal = illegal, npc = npc, civRating = civRating, level = level}}}
 
         for k, v in pairs(items) do 
             table.insert(itemLabels,v.label)
@@ -409,7 +360,36 @@ AddEventHandler('koe_vendors:sellMenu',function(location, npc, illegal, buymessa
             options = options
         })
 
-    lib.showContext('sellermenu')
+        lib.showContext('sellermenu')
+    else
+        local options = {{title = 'Crim Rating: '..crimRating, icon = 'fas fa-ranking-star', metadata = {'Current Civilian Rating!'}},{title = 'CLICK HERE TO SELL', description = 'This npc will buy any items listed below.', arrow = true, event = 'koe_vendors:sellCheck', icon = 'fas fa-basket-shopping', args = {location = location, illegal = illegal,  npc = npc, civRating = civRating, level = level}}}
+
+        for k, v in pairs(items) do 
+            table.insert(itemLabels,v.label)
+        end
+
+        table.sort(itemLabels, function(a, b) return a:lower() < b:lower() end)
+
+        for k2, v2 in ipairs(itemLabels) do
+              
+            local labels = {}
+            table.insert(labels, v2)
+            table.insert(options,
+                {
+                    title = labels,
+                }
+            )
+
+        end
+
+        lib.registerContext({
+            id = 'sellermenu',
+            title = location,
+            options = options
+        })
+
+        lib.showContext('sellermenu')
+    end
 
 end)
 
@@ -419,8 +399,32 @@ AddEventHandler('koe_vendors:sellCheck',function(data)
     location = data.location
     illegal = data.illegal
     npc = data.npc
-    buymessage = data.buymessage
     civRating = data.civRating
     level = data.level
-    TriggerServerEvent('koe_vendors:SellShit', location, illegal, npc, buymessage, civRating, level)
+    TriggerServerEvent('koe_vendors:SellShit', location, illegal, npc, civRating, level)
+end)
+--------------------------------------------------
+--------------------------------------------------
+
+RegisterNetEvent('koe_vendors:ratingsMenu')
+AddEventHandler('koe_vendors:ratingsMenu',function(crimRatingForMenu, civRatingForMenu)
+    lib.registerContext({
+        id = 'ratingsmenu',
+        title = 'Current Ratings',
+        options = {
+            {
+                title = 'Civilian Rating',
+                icon = 'fas fa-ranking-star',
+                description = 'Current Rating: '..civRatingForMenu,
+            },
+            {
+                title = 'Criminal Rating',
+                icon = 'fas fa-ranking-star',
+                description = 'Current Rating: '..crimRatingForMenu,
+            },
+
+        },
+    })
+
+    lib.showContext('ratingsmenu')
 end)

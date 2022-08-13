@@ -6,6 +6,8 @@ version '1.0.0'
 lua54 'yes'
 
 client_scripts {
+	'@PolyZone/client.lua',
+	'@PolyZone/CircleZone.lua',
 	'client.lua',
 	'config.lua'
  }
