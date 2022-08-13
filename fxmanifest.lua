@@ -1,13 +1,14 @@
-fx_version 'adamant'
+fx_version 'cerulean'
 
 game 'gta5'
-
-version '1.0.0'
 lua54 'yes'
 
+author 'Dalkoe of Koe Scripts'
+description 'Vendor system for buying and selling goods with XP system.'
+version '1.0.0'
+
+
 client_scripts {
-	'@PolyZone/client.lua',
-	'@PolyZone/CircleZone.lua',
 	'client.lua',
 	'config.lua'
  }
