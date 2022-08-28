@@ -4,48 +4,13 @@ local ox_inventory = exports.ox_inventory
 TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 ----------------------------------------------------------------
 
-
--- RegisterNetEvent('koe_vendors:updateDB')
--- AddEventHandler('koe_vendors:updateDB', function(npc, location)
---     local itemsForSale = Config.VendorLocations.blackMarket.itemsforsale
-
---     MySQL.Async.execute('TRUNCATE koe_vendors', {
---     })
-
---     for k, v in ipairs(itemsForSale) do
---         local i = tostring(v.itemname)
---         itemstock = tonumber(v.stock)
-
---         MySQL.Async.execute('INSERT INTO koe_vendors (item_name, stock) VALUES (@item_name, @stock)', {
---             ['@item_name'] = i,
---             ['@stock'] = itemstock,
---         })
---     end
--- end)
-
-
-    -- MySQL.Async.fetchAll('SELECT * FROM koe_vendors',
-    -- function(result)
-    --     local stockInfo = {}
-
-    --     for k, v in ipairs(result) do
-    --             for o,p in pairs(v) do
-    --                 print(o, p)
-    --             end
-    --         table.insert(stockInfo,v)
-
-    --     end
-       
-    -- end)
-
-
 RegisterNetEvent('koe_vendors:getCrimRating')
-AddEventHandler('koe_vendors:getCrimRating', function(npc, location)
+AddEventHandler('koe_vendors:getCrimRating', function(npc, location, items,illegal)
     local src = source
     local identifier =  ESX.GetPlayerFromId(src).identifier
     local crimlevel = exports['koe_vendors']:getCrimLevel(identifier)
 
-    TriggerClientEvent('koe_vendors:buyMenu', src, npc, location, crimlevel)
+    TriggerClientEvent('koe_vendors:buyMenu', src, npc, location, crimlevel, items, illegal)
 end)
 
 --HANDLES BUY ITEMS--
@@ -154,17 +119,17 @@ AddEventHandler('koe_vendors:getCivRating', function(location, npc, illegal, ite
         level = 3
     elseif civRating <= 2000 then
         level = 4
-    elseif civRating <= 2500 then
-        level = 5
     elseif civRating <= 3000 then
+        level = 5
+    elseif civRating <= 6000 then
         level = 6
-    elseif civRating <= 3500 then
+    elseif civRating <= 8000 then
         level = 7
-    elseif civRating <= 4000 then
+    elseif civRating <= 10000 then
         level = 8
-    elseif civRating <= 4500 then
+    elseif civRating <= 12000 then
         level = 9
-    elseif civRating >= 5000 then
+    elseif civRating >= 15000 then
         level = 10
     end
 
@@ -173,18 +138,18 @@ end)
 
 
 RegisterNetEvent('koe_vendors:SellShit')
-AddEventHandler('koe_vendors:SellShit', function(location, illegal, npc, civRating, level)
-    local items = {}
-    local sellableItems = Config.VendorLocations[npc].sellableitems
+AddEventHandler('koe_vendors:SellShit', function(location, illegal, npc, civRating, level, items)
+    local items = items
+    local items2 = {}
     local xPlayer = ESX.GetPlayerFromId(source)
     local soldfor
     local bonus = nil
 
     if illegal == false then
 
-        for k, v in pairs(sellableItems) do
+        for k, v in pairs(items) do
 
-            table.insert(items, k)
+            table.insert(items2, k)
             local itemCount = xPlayer.getInventoryItem(k).count
             local price = v.price * itemCount
 
@@ -268,8 +233,8 @@ AddEventHandler('koe_vendors:SellShit', function(location, illegal, npc, civRati
         end
     
     else
-        for k, v in pairs(sellableItems) do
-            table.insert(items, k)
+        for k, v in pairs(items) do
+            table.insert(items2, k)
             local itemCount = xPlayer.getInventoryItem(k).count
     
             xPlayer.removeInventoryItem(k, itemCount) 
