@@ -91,13 +91,24 @@ function getCrimLevel(identifier)
 end
 
 function giveCrimLevel(identifier, amount)
-    MySQL.Async.execute(
-        "UPDATE `users` SET `crim_level`= `crim_level` + @amount WHERE `identifier` = @identifier",
-        {["@amount"] = amount, ["@identifier"] = identifier},
+    local currentLevel = exports['koe_vendors']:getCrimLevel(identifier)
+    local newCrimLevel = amount + currentLevel
+
+    if newCrimLevel <= 0 then
+        MySQL.Async.execute(
+        "UPDATE `users` SET `crim_level`= @xp WHERE `identifier` = @identifier",
+        {["@xp"] = 0, ["@identifier"] = identifier},
         function()
-    end)
-    if Config.DebugPrints then
-        print(identifier..'Received '..amount..' Crim Rating')
+        end)
+    else
+        MySQL.Async.execute(
+            "UPDATE `users` SET `crim_level`= `crim_level` + @amount WHERE `identifier` = @identifier",
+            {["@amount"] = amount, ["@identifier"] = identifier},
+            function()
+        end)
+        if Config.DebugPrints then
+            print(identifier..'Received '..amount..' Crim Rating')
+        end
     end
 end
 
@@ -270,13 +281,24 @@ function getCivLevel(identifier)
 end
 
 function giveCivLevel(identifier, amount)
-    MySQL.Async.execute(
-        "UPDATE `users` SET `civ_level`= `civ_level` + @amount WHERE `identifier` = @identifier",
-        {["@amount"] = amount, ["@identifier"] = identifier},
+    local currentLevel = exports['koe_vendors']:getCivLevel(identifier)
+    local newCivlevel = amount + currentLevel
+    
+    if newCivlevel <= 0 then
+        MySQL.Async.execute(
+        "UPDATE `users` SET `civ_level`= @xp WHERE `identifier` = @identifier",
+        {["@xp"] = 0, ["@identifier"] = identifier},
         function()
-    end)
-    if Config.DebugPrints then
-        print(identifier..'Received '..amount..' Civ Rating')
+        end)
+    else
+        MySQL.Async.execute(
+            "UPDATE `users` SET `civ_level`= `civ_level` + @amount WHERE `identifier` = @identifier",
+            {["@amount"] = amount, ["@identifier"] = identifier},
+            function()
+        end)
+        if Config.DebugPrints then
+            print(identifier..'Received '..amount..' Civ Rating')
+        end
     end
 end
 
