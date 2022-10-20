@@ -1,35 +1,20 @@
 ----Gets ESX-------------------------------------------------------------------------------------------------------------------------------
-ESX = nil
-local peds = {}
-Citizen.CreateThread(function()
-	while ESX == nil do
-		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-		Citizen.Wait(0)
-	end
-	while ESX.GetPlayerData().job == nil do
-		Citizen.Wait(100)
-	end
+ESX = exports["es_extended"]:getSharedObject()
+
+RegisterNetEvent('esx:playerLoaded')
+AddEventHandler('esx:playerLoaded', function(xPlayer)
+	ESX.PlayerData = xPlayer
 	PlayerLoaded = true
-	ESX.PlayerData = ESX.GetPlayerData()
-
+    TriggerEvent('koe_vendors:spawnZones')
 end)
-
-Citizen.CreateThread(function()
-	RegisterNetEvent('esx:playerLoaded')
-	AddEventHandler('esx:playerLoaded', function (xPlayer)
-		while ESX == nil do
-			Citizen.Wait(0)
-		end
-		ESX.PlayerData = xPlayer
-		PlayerLoaded = true
-        CreateBlipsVendors()
-        TriggerEvent('koe_vendors:spawnZones')
-	end)
-end) 
 
 RegisterNetEvent('esx:setJob')
 AddEventHandler('esx:setJob', function(job)
 	ESX.PlayerData.job = job
+end)
+
+AddEventHandler('esx:onPlayerSpawn', function()
+    local ped = PlayerPedId()
 end)
 
 AddEventHandler('onResourceStart', function(resourceName)
@@ -42,6 +27,7 @@ AddEventHandler('onResourceStart', function(resourceName)
 	end
 end)
 ---------------------------------------------------------------------------------------------------------------------------------------
+local peds = {}
 local zonesSpawned = false
 local PlayerData = {}
 local vendors

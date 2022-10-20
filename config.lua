@@ -179,6 +179,8 @@ Config.VendorLocations = {
             fatherfleezus_sticker = {price = 40, label = 'FatherFleezus Sticker'},
             destroyavoy_sticker = {price = 40, label = 'Destroyavoy Sticker'},
             under_sticker = {price = 40, label = 'UND3R8ED Sticker'},
+            kodiak_sticker = {price = 40, label = 'KodiakClutch Sticker'},
+            booh_sticker = {price = 40, label = 'Booh Sticker'},
         }
     },
 	legalFish = {
@@ -266,7 +268,7 @@ Config.VendorLocations = {
 		illegal = true,
         type = 'sellers',
         items = { 
-			kuz_merryweather = {price = 170, label = 'Merryweather parts'},
+			kuz_merryweather = {price = 800, label = 'Merryweather parts'},
             kuz_plasmacutter = {price = 550, label = 'Underwater Plasma Cutter'},
             diamond = {price = 1500, label = 'Diamond'},
             engagement_ring = {price = 450, label = 'Engagement Ring'},
