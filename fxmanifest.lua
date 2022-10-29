@@ -9,14 +9,14 @@ version '1.0.0'
 
 
 client_scripts {
+	'config.lua',
 	'client.lua',
-	'config.lua'
  }
  
  server_scripts {
+	'config.lua',
 	'@mysql-async/lib/MySQL.lua',
 	'server.lua',
-	'config.lua'
  }
 
 
@@ -30,4 +30,4 @@ server_export 'setCivLevel'
 
 
 shared_script '@ox_lib/init.lua'
-shared_script '@es_extended/imports.lua'
+-- shared_script '@es_extended/imports.lua'  --if using esx uncomment this

@@ -14,8 +14,7 @@
 -- ╚═════╝░░╚════╝░╚═╝░░╚═╝╚═╝╚═╝░░░░░░░░╚═╝░░░╚═════╝░
 
 Config = {}
-
-Config.DebugPrints = false           --This will print when rating is given or set or changed
+Config.Framework = 'qb'                -- 'esx' for es_extended legacy, 'qb' for Qb-Core ||| If using ESX please read the fxmanifest.
 
 ------IMPORTANT INFORMATION------------------
 -- Type Vendor means you BUY items from them
@@ -26,6 +25,7 @@ Config.DebugPrints = false           --This will print when rating is given or s
 
 
 Config.VendorLocations = {
+    --LEGAL VENDOR EXAMPLE
 	legalFishing = {                                        --Simple Name for the vendor, must be unique
 		location = 'Fish Vendor',                           -- Location name, shows in menus
         coords = vector3(-1600.4915, -976.0989, 12.0177),   -- Location of the NPC
@@ -39,19 +39,7 @@ Config.VendorLocations = {
             {itemname = 'legalbait', label = 'Legal Bait', price = 8, image = 'https://media.discordapp.net/attachments/1004690515700224010/1006526816317620264/fishbait.png'},
         }
     },
-    divingSupplies = {
-		location = 'Diving Supplies', 
-        coords = vector3(-1686.6241, -1072.4827, 12.1518),
-        model = 'a_f_y_beach_01',
-        heading = 53.4636,
-        illegal = false,
-        type = 'vendor',
-        blip = {label = 'Diving Supplies', sprite = 366, colour = 54}, --Blip will use the location of the NPC, set to NIL if you dont want a blip.
-        items = { 
-            {itemname = 'kuz_divinggear', label = 'Diving Gear', price = 1000, image = 'https://media.discordapp.net/attachments/1004690515700224010/1007937783337340979/kuz_divinggear.png'}, --Name of the item, the LABEL of the item, Price, direct image link
-            {itemname = 'kuz_divinggeargood', label = 'Scuba Gear', price = 5000, image = 'https://media.discordapp.net/attachments/1004690515700224010/1007937790929018880/kuz_divinggeargood.png'},
-        },
-    },
+    --ILLEGAL VENDOR EXAMPLE
     blackMarket = {
 		location = 'Black Market', 
         coords = vector3(287.56, 2843.76, 43.72),
@@ -76,45 +64,10 @@ Config.VendorLocations = {
 
         },
     },
-    attachmentsVendor = {
-		location = 'Attachments Vendor', 
-        coords = vector3(-580.36, -1589.6, 25.76),
-        model = 'u_m_m_streetart_01',
-        heading = 99.88,
-        illegal = true,
-        blip = nil,
-        type = 'vendor',
-        items = { 
-            {itemname = 'at_flashlight', label = 'Tatical Flashlight', price = 2000, requiredXP = 50, image = 'https://media.discordapp.net/attachments/1004690515700224010/1005255646951772290/unknown.png'}, --Name of the item, the LABEL of the item, Price, direct image link
-            {itemname = 'at_clip_extended_pistol', label = 'Extended Pistol Magazine', price = 10000, requiredXP = 250, image = 'https://media.discordapp.net/attachments/1004690515700224010/1005255787804901506/unknown.png'},
-            {itemname = 'at_clip_extended_smg', label = 'Extended Smg Magazine', price = 25000, requiredXP = 300, image = 'https://media.discordapp.net/attachments/1004690515700224010/1005256270166634546/unknown.png'},
-            {itemname = 'at_clip_extended_shotgun', label = 'Extended Shotgun Magazine', price = 25000, requiredXP = 300, image = 'https://media.discordapp.net/attachments/1004690515700224010/1005256320913526824/unknown.png'},
-            {itemname = 'at_clip_extended_rifle', label = 'Extended Rifle Magazine', price = 37500, requiredXP = 300, image = 'https://media.discordapp.net/attachments/1004690515700224010/1005256387871387749/unknown.png'},
-            {itemname = 'at_suppressor_light', label = 'Suppressor', price = 20000, requiredXP = 500, image = 'https://media.discordapp.net/attachments/1004690515700224010/1005256436818903040/unknown.png'},
-            {itemname = 'at_suppressor_heavy', label = 'Heavy Suppressor', price = 75000, requiredXP = 700, image = 'https://media.discordapp.net/attachments/1004690515700224010/1005256502468157530/unknown.png'}
-        },
-    },
-    EMSshop = {
-		location = 'EMS Items Shop', 
-        coords = vector3(304.72, -600.64, 42.28),
-        model = 's_m_m_doctor_01',
-        heading = 310.96,
-        illegal = false,
-        blip = nil,
-        type = 'vendor',
-        items = { 
-            {itemname = 'burncream', label = 'Burn Cream', price = 150, image = 'https://cdn.discordapp.com/attachments/1016480861165735936/1020735371136471140/burncream.png'}, --Name of the item, the LABEL of the item, Price, direct image link
-            {itemname = 'analese', label = 'Anal-Ese', price = 150, image = 'https://cdn.discordapp.com/attachments/1016480861165735936/1020740651781996634/analese.png'},
-            {itemname = 'nutcream', label = 'Nut Cream', price = 150, image = 'https://cdn.discordapp.com/attachments/1016480861165735936/1020740652251746324/nutcream.png'},
-            {itemname = 'bluepill', label = 'Blue Pill', price = 150, image = 'https://cdn.discordapp.com/attachments/1016480861165735936/1020741329132736582/bluepill.png'},
-            {itemname = 'tylenol', label = 'Tylenol', price = 150, image = 'https://cdn.discordapp.com/attachments/1016480861165735936/1020741806633263175/tylenol.png'},
-        },
-    },
     --Sellers--------------------------------------------
     -----------------------------------------------------
-    -----------------------------------------------------
-    -----------------------------------------------------
-    
+
+    --LEGAL SELLER EXAMPLE
     legalHunting = {
 		location = 'Legal NPC - Hunting', 
         coords = vector3(591.88, 2782.76, 42.48),
@@ -124,23 +77,10 @@ Config.VendorLocations = {
 		illegal = false,
         type = 'sellers',
         items = { 
-            meat = {price = 12, label = 'Meat'},
-			hide = {price = 12, label = 'Hide'},
-            coyote_pelt_1 = {price = 150, label = 'Coyote Pelt: Quality 1'},
-			coyote_pelt_2 = {price = 200, label = 'Coyote Pelt: Quality 2'},
-			coyote_pelt_3 = {price = 350, label = 'Coyote Pelt: Quality 3'},
-			deer_pelt_1 = {price = 150, label = 'Deer Pelt: Quality 1'},
-			deer_pelt_2 = {price = 200, label = 'Deer Pelt: Quality 2'},
-			deer_pelt_3 = {price = 350, label = 'Deer Pelt: Quality 3'},
-			pig_pelt_1 = {price = 150, label = 'Pig Pelt: Quality 1'},
-			pig_pelt_2 = {price = 200, label = 'Pig Pelt: Quality 2'},
-			pig_pelt_3 = {price = 350, label = 'Pig Pelt: Quality 3'},
-			boar_pelt_1 = {price = 150, label = 'Boar Pelt: Quality 1'},
-			boar_pelt_2 = {price = 200, label = 'Boar Pelt: Quality 2'},
-			boar_pelt_3 = {price = 350, label = 'Boar Pelt: Quality 3'},
-
+            repairkit = {price = 100, label = 'Repair Kit'},
         }
     },
+    --ILLEGAL SELLER EXAMPLE
 	illegalHunting = {
 		location = 'Illegal NPC Hunting', 
         coords = vector3(-1593.08, 5202.88, 3.32),
@@ -150,131 +90,7 @@ Config.VendorLocations = {
 		illegal = true,
         type = 'sellers',
         items = { 
-			lion_pelt_1 = {price = 500, label = 'Lion Pelt: Quality 1'},
-			lion_pelt_2 = {price = 600, label = 'Lion Pelt: Quality 2'},
-			lion_pelt_3 = {price = 1000, label = 'Lion Pelt: Quality 3'},
-        }
-    },
-	pawnShop = {
-		location = 'Pawn Shop', 
-        coords = vector3(286.88, 137.08, 103.28),
-        model = 'u_m_m_bikehire_01',
-        heading = 342,
-        blip = {label = 'Pawnshop', sprite = 500, colour = 2},
-		illegal = false,
-        type = 'sellers',
-        items = { 
-			rackit_sticker = {price = 40, label = 'Rackit Sticker'},
-			witty_sticker = {price = 40, label = 'Witty Sticker'},
-			mad_sticker = {price = 40, label = 'Madchild Sticker'},
-			jax_sticker = {price = 40, label = 'JaxStash Sticker'},
-			lobo_sticker = {price = 40, label = 'Lobo Sticker'},
-			monncath_sticker = {price = 40, label = 'Monncath Sticker'},
-			kevin_sticker = {price = 40, label = 'Kevin Sticker'},
-			elijah_sticker = {price = 40, label = 'Elijah Sticker'},
-			cyclopsed_sticker = {price = 40, label = 'Cyclopsed Sticker'},
-			strange_sticker = {price = 40, label = 'Strangelove Sticker'},
-			hanklet69_sticker = {price = 40, label = 'Hanklet69 Sticker'},
-            caydo_sticker = {price = 40, label = 'Caydo Sticker'},
-            fatherfleezus_sticker = {price = 40, label = 'FatherFleezus Sticker'},
-            destroyavoy_sticker = {price = 40, label = 'Destroyavoy Sticker'},
-            under_sticker = {price = 40, label = 'UND3R8ED Sticker'},
-            kodiak_sticker = {price = 40, label = 'KodiakClutch Sticker'},
-            booh_sticker = {price = 40, label = 'Booh Sticker'},
-        }
-    },
-	legalFish = {
-		location = 'Fish Market', 
-        coords = vector3(-1842.04, -1199.32, 13.32),
-        model = 's_m_y_factory_01',
-        heading = 239.56,
-        blip = {label = 'Fish Market', sprite = 371, colour = 18},
-		illegal = false,
-        type = 'sellers',
-        items = { 
-			swordfish = {price = 250, label = 'Sword Fish'},
-			tunafish = {price = 250, label = 'Tuna Fish'},
-			mahifish = {price = 250, label = 'Mahi Fish'},
-			halibut = {price = 100, label = 'Halibut'},
-			redfish = {price = 100, label = 'Red Fish'},
-			bluefish = {price = 100, label = 'Blue Fish'},
-			salmon = {price = 100, label = 'Salmon'},
-			perch = {price = 100, label = 'Perch'},
-			bass = {price = 100, label = 'Bass'},
-			tilapia = {price = 100, label = 'Tilapia'},
-			catfish = {price = 100, label = 'Cat Fish'},
-			shad = {price = 100, label = 'Shad'},
-			rainbowfish = {price = 100, label = 'Rainbow Fish'},
-        }
-    },
-    illegalFish = {
-		location = 'Illegal Fish Market', 
-        coords = vector3(1320.96, 4314.56, 37.16),
-        model = 'u_m_m_streetart_01',
-        heading = 82,
-        blip = nil,
-		illegal = true,
-        type = 'sellers',
-        items = { 
-            seaturtle = {price = 300, label = 'Seaturtle'},
-			pufferfish = {price = 1000, label = 'Puffer Fish'},
-			piranha = {price = 1100, label = 'Piranha'},
-			hammerhead = {price = 5000, label = 'Hammer Head'},
-			greatwhite = {price = 40000, label = 'Great White'},
-        }
-    },
-    scrapper = {
-		location = 'Scrapper', 
-        coords = vector3(1130.52, -776.8, 56.6),
-        model = 'ig_cletus',
-        heading = 357,
-        blip = {label = 'Scrapper', sprite = 527, colour = 18},
-		illegal = false,
-        type = 'sellers',
-        items = { 
-			rubber = {price = 5, label = 'Rubber'},
-            scrap_metal = {price = 5, label = 'Scrap Metal'},
-            electric_scrap = {price = 5, label = 'Electronic Scrap'},
-            plastic = {price = 5, label = 'Plastic'},
-            glass = {price = 5, label = 'Glass'},
-            aluminium = {price = 5, label = 'Aluminium'},
-            copper = {price = 5, label = 'Copper'},
-            steel = {price = 5, label = 'Steel'},
-        }
-    },
-    jeweler = {
-		location = 'Jeweler/Collector', 
-        coords = vector3(-20.76, 6490.68, 30.48),
-        model = 'ig_davenorton',
-        heading = 45,
-        blip = {label = 'Jeweler/Collector', sprite = 617, colour = 4},
-		illegal = false,
-        type = 'sellers',
-        items = { 
-			kuz_watch = {price = 60, label = 'Expensive watch'},
-            kuz_pearl = {price = 225, label = 'Pearl'},
-            kuz_jewelry = {price = 60, label = 'Jewelry'},
-            kuz_rarecoin = {price = 250, label = 'Rare Coin'},
-            kuz_goldcoin = {price = 75, label = 'Golden Coin'},
-            kuz_silvercoin = {price = 65, label = 'Silver Coin'},
-        }
-    },
-    illegalJeweler = {
-		location = 'Illegal Collector', 
-        coords = vector3(1641.72, 4853.24, 41.04),
-        model = 'u_m_m_streetart_01',
-        heading = 100,
-        blip = nil,
-		illegal = true,
-        type = 'sellers',
-        items = { 
-			kuz_merryweather = {price = 800, label = 'Merryweather parts'},
-            kuz_plasmacutter = {price = 550, label = 'Underwater Plasma Cutter'},
-            diamond = {price = 1500, label = 'Diamond'},
-            engagement_ring = {price = 450, label = 'Engagement Ring'},
-            rolex_watch = {price = 600, label = 'Rolex Watch'},
-            gold_bracelet = {price = 800, label = 'Gold Bracelet'},
-            jewels = {price = 200, label = 'Rare Jewels'},
+			repairkit = {price = 500, label = 'Repair kit'},
         }
     },
 }

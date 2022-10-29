@@ -1,43 +1,68 @@
-----Gets ESX-------------------------------------------------------------------------------------------------------------------------------
-ESX = exports["es_extended"]:getSharedObject()
+----Gets Framework-------------------------------------------------------------------------------------------------------------------------------
+local framework = Config.Framework
+local ESX, QBCore
 
-RegisterNetEvent('esx:playerLoaded')
-AddEventHandler('esx:playerLoaded', function(xPlayer)
-	ESX.PlayerData = xPlayer
-	PlayerLoaded = true
-    TriggerEvent('koe_vendors:spawnZones')
+CreateThread(function()
+    if framework == 'esx' then
+        while ESX == nil do
+            TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+            Citizen.Wait(0)
+        end
+
+        RegisterNetEvent('esx:playerLoaded')
+        AddEventHandler('esx:playerLoaded', function (xPlayer)
+            ESX.PlayerData = xPlayer
+        end)
+
+        RegisterNetEvent('esx:setJob')
+        AddEventHandler('esx:setJob', function (job)
+            ESX.PlayerData.job = job
+        end)
+    elseif framework == 'qb' then
+        QBCore = exports['qb-core']:GetCoreObject()
+    end
 end)
 
-RegisterNetEvent('esx:setJob')
-AddEventHandler('esx:setJob', function(job)
-	ESX.PlayerData.job = job
-end)
 
-AddEventHandler('esx:onPlayerSpawn', function()
-    local ped = PlayerPedId()
-end)
+if Config.Framework == 'esx' then
+    RegisterNetEvent('esx:playerLoaded')
+    AddEventHandler('esx:playerLoaded', function(xPlayer)
+        CreateBlipsVendors()
+        TriggerEvent('koe_vendors:spawnZones')
+    end)
+
+    RegisterNetEvent('esx:playerLoaded')
+    AddEventHandler('esx:playerLoaded', function(xPlayer)
+        ESX.PlayerData = xPlayer
+        PlayerLoaded = true
+    end)
+
+    RegisterNetEvent('esx:setJob')
+    AddEventHandler('esx:setJob', function(job)
+        ESX.PlayerData.job = job
+    end)
+
+    AddEventHandler('esx:onPlayerSpawn', function()
+        local ped = PlayerPedId()
+    end)
+elseif Config.Framework == 'qb' then
+    RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
+        CreateBlipsVendors()
+        TriggerEvent('koe_vendors:spawnZones')
+    end)
+end
 
 AddEventHandler('onResourceStart', function(resourceName)
 	if (resourceName == GetCurrentResourceName()) then
-        while (ESX == nil) do Citizen.Wait(100) end        
-        Citizen.Wait(5000)
-        ESX.PlayerLoaded = true
-        CreateBlipsVendors()
         TriggerEvent('koe_vendors:spawnZones')
 	end
 end)
 ---------------------------------------------------------------------------------------------------------------------------------------
+
 local peds = {}
 local zonesSpawned = false
 local PlayerData = {}
 local vendors
-
-Citizen.CreateThread(function()
-    while ESX == nil do
-        TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-        Citizen.Wait(0)
-    end
-end)
 
 RegisterCommand('ratings', function(source)
 	TriggerServerEvent('koe_vendors:ratingsForMenu')
@@ -84,29 +109,55 @@ AddEventHandler('koe_vendors:spawnZones',function()
             SetEntityInvincible(vendorNPC[i], true)
             SetBlockingOfNonTemporaryEvents(vendorNPC[i], true)
             
-            exports.qtarget:AddEntityZone("vendors", vendorNPC[i], {
-                name="vendors",
-                debugPoly=false,
-                useZ = true
-                    }, {
-                options = {
-                    {
-                        event = "koe_vendors:WhichMenu",
-                        icon = "fa-solid fa-clipboard",
-                        label = "Open Menu",
-                        location = self.data.location,
-                        npc = peds[i].location,
-                        illegal = self.data.illegal,
-                        items =self.data.items,
-                        type = self.data.type,
-                        canInteract = function()
-                            local player = PlayerPedId()
-                            return IsPedOnFoot(player)
-                        end,
-                    },                                     
-                },
-                distance = 2
-            })
+            if Config.Framework == 'esx' then
+                exports.qtarget:AddEntityZone("vendors", vendorNPC[i], {
+                    name="vendors",
+                    debugPoly=false,
+                    useZ = true
+                        }, {
+                    options = {
+                        {
+                            event = "koe_vendors:WhichMenu",
+                            icon = "fa-solid fa-clipboard",
+                            label = "Open Menu",
+                            location = self.data.location,
+                            npc = peds[i].location,
+                            illegal = self.data.illegal,
+                            items =self.data.items,
+                            type = self.data.type,
+                            canInteract = function()
+                                local player = PlayerPedId()
+                                return IsPedOnFoot(player)
+                            end,
+                        },                                     
+                    },
+                    distance = 2
+                })
+            elseif Config.Framework == 'qb' then
+                exports['qb-target']:AddEntityZone("vendors", vendorNPC[i], {
+                    name="vendors",
+                    debugPoly=false,
+                    useZ = true
+                        }, {
+                    options = {
+                        {
+                            event = "koe_vendors:WhichMenu",
+                            icon = "fa-solid fa-clipboard",
+                            label = "Open Menu",
+                            location = self.data.location,
+                            npc = peds[i].location,
+                            illegal = self.data.illegal,
+                            items =self.data.items,
+                            type = self.data.type,
+                            canInteract = function()
+                                local player = PlayerPedId()
+                                return IsPedOnFoot(player)
+                            end,
+                        },                                     
+                    },
+                    distance = 2
+                })
+            end
         end
 
         function pedZones:onExit()
