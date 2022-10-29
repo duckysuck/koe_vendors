@@ -1,0 +1,2 @@
+ALTER TABLE `players` ADD COLUMN `civ_level` INT(250) NULL DEFAULT '0';
+ALTER TABLE `players` ADD COLUMN `crim_level` INT(250) NULL DEFAULT '0';
