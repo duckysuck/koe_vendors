@@ -15,6 +15,7 @@
 
 Config = {}
 Config.Framework = 'qb'                -- 'esx' for es_extended legacy, 'qb' for Qb-Core ||| If using ESX please read the fxmanifest.
+Config.ContextMenu = 'ox_lib'   ---'ox_lib' for OX, 'qb' for qb-menu
 
 ------IMPORTANT INFORMATION------------------
 -- Type Vendor means you BUY items from them

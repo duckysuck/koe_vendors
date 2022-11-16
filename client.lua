@@ -30,7 +30,7 @@ if Config.Framework == 'esx' then
         CreateBlipsVendors()
         TriggerEvent('koe_vendors:spawnZones')
     end)
-
+    
     RegisterNetEvent('esx:playerLoaded')
     AddEventHandler('esx:playerLoaded', function(xPlayer)
         ESX.PlayerData = xPlayer
@@ -211,15 +211,30 @@ AddEventHandler('koe_vendors:buyMenu',function(npc, location, crimlevel, items, 
             local itemname = v.itemname
             local image = v.image
 
-            table.insert(optionsLegal,
-                {
-                    title = labels,
-                    event = 'koe_vendors:keyboard',
-                    metadata = {'Price: $'..price},
-                    image = image,
-                    args = {price = price, item = itemname}
-                }
-            )
+            if Config.ContextMenu == 'ox_lib' then
+                table.insert(optionsLegal,
+                    {
+                        title = labels,
+                        event = 'koe_vendors:keyboard',
+                        metadata = {'Price: $'..price},
+                        image = image,
+                        args = {price = price, item = itemname}
+                    }
+                )
+            end
+            if Config.ContextMenu == 'qb' then
+                table.insert(optionsLegal,
+                    {
+                        header = labels,
+                        txt = {'Price: $'..price},
+                        params = {
+                            event = 'koe_vendors:keyboard',
+                            args = {price = price, item = itemname, image = image}
+                        }
+                        
+                    }
+                )
+            end
         end
     elseif illegal == true then
         for k, v in pairs(items) do
@@ -229,68 +244,94 @@ AddEventHandler('koe_vendors:buyMenu',function(npc, location, crimlevel, items, 
             local requiredXP = v.requiredXP
             local image = v.image
 
-            table.insert(optionsIllegal,
-                {
-                    title = labels,
-                    event = 'koe_vendors:amountIllegal',
-                    metadata = {
-                        {label = 'Price ', value = '$'..price},
-                        {label = 'Required Crime Rating ', value = requiredXP},
-                    },
-                    image = image,
-                    args = {price = price, item = itemname, requiredXP = requiredXP}
-                }
-            )
+            if Config.ContextMenu == 'ox_lib' then
+                table.insert(optionsIllegal,
+                    {
+                        title = labels,
+                        event = 'koe_vendors:amountIllegal',
+                        metadata = {
+                            {label = 'Price ', value = '$'..price},
+                            {label = 'Required Crime Rating ', value = requiredXP},
+                        },
+                        image = image,
+                        args = {price = price, item = itemname, requiredXP = requiredXP}
+                    }
+                )
+            end
+            if Config.ContextMenu == 'qb' then
+                table.insert(optionsIllegal,
+                    {
+                        header = labels,
+                        txt = {'Price: $'..price..' Required Rating: '..requiredXP},
+                        params = {
+                            event = 'koe_vendors:amountIllegal',
+                            args = {price = price, item = itemname, requiredXP = requiredXP}
+                        }
+                        
+                    }
+                )
+            end
         end
     end
 
     if illegal == false then
-        lib.registerContext({
-            id = 'legalMenu',
-            title = location,
-            options = {
-                {
-                    title = 'This vendor is  ' ..illegalString
-                },
-                {
-                    title = 'Items For Sale',
-                    menu = 'legalItemsMenu',
-                    description = 'Purchase goods from this vendor'
-                },
-                lib.registerContext({
-                    id = 'legalItemsMenu',
-                    menu = 'legalMenu',
-                    title = location,
-                    options = optionsLegal
-                })
-            }
-        })
+        if Config.ContextMenu == 'ox_lib' then
+            lib.registerContext({
+                id = 'legalMenu',
+                title = location,
+                options = {
+                    {
+                        title = 'This vendor is  ' ..illegalString
+                    },
+                    {
+                        title = 'Items For Sale',
+                        menu = 'legalItemsMenu',
+                        description = 'Purchase goods from this vendor'
+                    },
+                    lib.registerContext({
+                        id = 'legalItemsMenu',
+                        menu = 'legalMenu',
+                        title = location,
+                        options = optionsLegal
+                    })
+                }
+            })
             lib.showContext('legalMenu')
+        end
+        if Config.ContextMenu == 'qb' then
+            exports['qb-menu']:openMenu(optionsLegal)
+        end
+
     elseif illegal == true then
-        lib.registerContext({
-            id = 'illegalMenu',
-            title = location,
-            options = {
-                {
-                    title = 'This vendor is  ' ..illegalString
-                },
-                {
-                    title = 'Current Crime Rating: ' ..crimlevel
-                },
-                {
-                    title = 'Illegal Items For Sale',
-                    menu = 'illegalItemsMenu',
-                    description = 'Purchase goods from this vendor'
-                },
-                lib.registerContext({
-                    id = 'illegalItemsMenu',
-                    menu = 'illegalMenu',
-                    title = location,
-                    options = optionsIllegal
-                })
-            }
-        })
-            lib.showContext('illegalMenu')
+        if Config.ContextMenu == 'ox_lib' then
+            lib.registerContext({
+                id = 'illegalMenu',
+                title = location,
+                options = {
+                    {
+                        title = 'This vendor is  ' ..illegalString
+                    },
+                    {
+                        title = 'Current Crime Rating: ' ..crimlevel
+                    },
+                    {
+                        title = 'Illegal Items For Sale',
+                        menu = 'illegalItemsMenu',
+                        description = 'Purchase goods from this vendor'
+                    },
+                    lib.registerContext({
+                        id = 'illegalItemsMenu',
+                        menu = 'illegalMenu',
+                        title = location,
+                        options = optionsIllegal
+                    })
+                }
+            })
+                lib.showContext('illegalMenu')
+        end
+        if Config.ContextMenu == 'qb' then
+            exports['qb-menu']:openMenu(optionsIllegal)
+        end
     end
 
 end)
