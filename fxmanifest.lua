@@ -5,7 +5,7 @@ lua54 'yes'
 
 author 'Dalkoe of Koe Scripts'
 description 'Vendor system for buying and selling goods with XP system.'
-version '1.0.0'
+version '1.1.0'
 
 
 client_scripts {
