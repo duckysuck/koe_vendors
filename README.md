@@ -5,10 +5,6 @@ If a vendor is illegal you can require a certain amount of crim rating for the p
 Civilian rating will give a boost in the amount of money they get paid on the legal sellers. 
 Easy to add as many vendors as you want, uses zones for spawning of the npcs for optimization. 
 
-# Join the Discord!
-
-[![Koe Scripts Discord](https://media.discordapp.net/attachments/973750342263144558/1003740741178249318/invite.png?width=810&height=216)](https://discord.gg/5JuxDnNm94)
-
 # Features:
 * Buy/Sell Items
 * All setup done through the config.
